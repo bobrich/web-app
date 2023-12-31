@@ -16,8 +16,8 @@ resource "aws_iam_role" "lambda_role" {
 }
 
 resource "aws_iam_role_policy" "lambda_role_policy" {
-  name   = "lambda_policy"
-  role   = aws_iam_role.lambda_role.id
+  name = "lambda_policy"
+  role = aws_iam_role.lambda_role.id
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -98,49 +98,49 @@ resource "aws_iam_role" "codebuild_role" {
             "apigateway:GET",
             "secretsmanager:DescribeSecret"
           ],
-          Effect = "Allow",
+          Effect   = "Allow",
           Resource = "*"
-        },{Effect = "Allow", Action = "*", Resource = "*"},
-      {
-        Effect = "Allow",
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:Get*"
-        ],
-        Resource = ["arn:aws:s3:::tfstate-rrich/*",
-                    "arn:aws:s3:::tfstate-rrich/",
-                    "arn:aws:s3:::tfstate-rrich",
-                    "arn:aws:s3:::codepipeline-rrich/*",
-                    "arn:aws:s3:::codepipeline-rrich/",
-                    "arn:aws:s3:::codepipeline-rrich"]
-      },
-    {
-    "Effect": "Allow",
-    "Action": [
-      "s3:GetObject",
-      "s3:ListBucket"
-    ],
-    "Resource": [
-      "arn:aws:s3:::codepipeline-rrich/*",
-      "arn:aws:s3:::codepipeline-rrich"
-    ]
-  },
-      {
-        Effect = "Allow",
-        Action = [
-          "s3:ListBucket"
-        ],
-        Resource = "arn:aws:s3:::tfstate-rrich"
-      },
-      {
-        Effect = "Allow",
-        Action = [
-         "secretsmanager:GetSecretValue"
-        ],
-        Resource = "${aws_secretsmanager_secret.github_token.arn}"
-        } 
+        }, { Effect = "Allow", Action = "*", Resource = "*" },
+        {
+          Effect = "Allow",
+          Action = [
+            "s3:GetObject",
+            "s3:PutObject",
+            "s3:DeleteObject",
+            "s3:Get*"
+          ],
+          Resource = ["arn:aws:s3:::tfstate-rrich/*",
+            "arn:aws:s3:::tfstate-rrich/",
+            "arn:aws:s3:::tfstate-rrich",
+            "arn:aws:s3:::codepipeline-rrich/*",
+            "arn:aws:s3:::codepipeline-rrich/",
+          "arn:aws:s3:::codepipeline-rrich"]
+        },
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "s3:GetObject",
+            "s3:ListBucket"
+          ],
+          "Resource" : [
+            "arn:aws:s3:::codepipeline-rrich/*",
+            "arn:aws:s3:::codepipeline-rrich"
+          ]
+        },
+        {
+          Effect = "Allow",
+          Action = [
+            "s3:ListBucket"
+          ],
+          Resource = "arn:aws:s3:::tfstate-rrich"
+        },
+        {
+          Effect = "Allow",
+          Action = [
+            "secretsmanager:GetSecretValue"
+          ],
+          Resource = "${aws_secretsmanager_secret.github_token.arn}"
+        }
       ]
     })
   }
@@ -178,16 +178,16 @@ resource "aws_iam_role" "codepipeline_role" {
             "s3:GetObjectVersion",
             "s3:GetBucketVersioning"
           ],
-          Effect = "Allow",
+          Effect   = "Allow",
           Resource = "*"
         },
         {
-          Action = "iam:PassRole",
-          Effect = "Allow",
+          Action   = "iam:PassRole",
+          Effect   = "Allow",
           Resource = "*",
           Condition = {
             StringEqualsIfExists = {
-              "iam:PassedToService": [
+              "iam:PassedToService" : [
                 "codebuild.amazonaws.com",
                 "lambda.amazonaws.com"
               ]
@@ -227,8 +227,8 @@ resource "aws_codepipeline" "web_app_pipeline" {
         OAuthToken = var.github_token
       }
 
-      output_artifacts = [ 
-       "source_output"
+      output_artifacts = [
+        "source_output"
       ]
     }
   }
@@ -271,12 +271,12 @@ resource "aws_api_gateway_method" "my_api_method" {
 
 resource "aws_api_gateway_integration" "my_api_integration" {
   integration_http_method = "GET"
-  http_method = "GET"
-  rest_api_id = aws_api_gateway_rest_api.my_api.id
-  resource_id = aws_api_gateway_resource.my_api_resource.id
+  http_method             = "GET"
+  rest_api_id             = aws_api_gateway_rest_api.my_api.id
+  resource_id             = aws_api_gateway_resource.my_api_resource.id
   #http_method = aws_api_gateway_method.my_api_method.http_method
-  type        = "AWS_PROXY"
-  uri         = aws_lambda_function.web_app.invoke_arn
+  type = "AWS_PROXY"
+  uri  = aws_lambda_function.web_app.invoke_arn
 }
 
 resource "aws_api_gateway_deployment" "my_api_deployment" {
@@ -298,12 +298,12 @@ resource "aws_codebuild_project" "web_app_build" {
   description  = "Build project for the web application"
   service_role = aws_iam_role.codebuild_role.arn
   artifacts {
-    type = "CODEPIPELINE" 
+    type = "CODEPIPELINE"
   }
 
   environment {
     compute_type = "BUILD_GENERAL1_SMALL"
-    image        = "aws/codebuild/standard:5.0" 
+    image        = "aws/codebuild/standard:5.0"
     type         = "LINUX_CONTAINER"
     environment_variable {
       name  = "GITHUB_TOKEN"
@@ -313,8 +313,8 @@ resource "aws_codebuild_project" "web_app_build" {
   }
 
   source {
-    type            = "CODEPIPELINE"
-    buildspec       = "buildspec.yml" 
+    type      = "CODEPIPELINE"
+    buildspec = "buildspec.yml"
   }
 }
 
