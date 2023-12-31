@@ -1,8 +1,3 @@
-variable "github_token" {
-  description = "GitHub token for AWS CodePipeline"
-  type        = string
-}
-
 # IAM Role for Lambda function
 resource "aws_iam_role" "lambda_role" {
   name = "lambda_role"
@@ -256,8 +251,9 @@ resource "aws_codebuild_project" "web_app_build" {
     image        = "aws/codebuild/standard:5.0" 
     type         = "LINUX_CONTAINER"
     environment_variable {
-      name  = "EXAMPLE_VAR"
-      value = "example_value"
+      name  = "GITHUB_TOKEN"
+      type  = "SECRETS_MANAGER"
+      value = aws_secretsmanager_secret.github_token.id
     }
   }
 
@@ -274,3 +270,13 @@ terraform {
     region = "us-east-1"
   }
 }
+
+resource "aws_secretsmanager_secret" "github_token" {
+  name = "my_github_token"
+}
+
+resource "aws_secretsmanager_secret_version" "github_token" {
+  secret_id     = aws_secretsmanager_secret.github_token.id
+  secret_string = var.github_token
+}
+
