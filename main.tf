@@ -70,6 +70,22 @@ resource "aws_iam_role" "codebuild_role" {
           Effect = "Allow",
           Resource = "*"
         },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ],
+        Resource = "arn:aws:s3:::tfstate-rrich/*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:ListBucket"
+        ],
+        Resource = "arn:aws:s3:::tfstate-rrich"
+      } 
       ]
     })
   }
