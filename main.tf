@@ -1,3 +1,8 @@
+variable "github_token" {
+  description = "GitHub token for AWS CodePipeline"
+  type        = string
+}
+
 # IAM Role for Lambda function
 resource "aws_iam_role" "lambda_role" {
   name = "lambda_role"
