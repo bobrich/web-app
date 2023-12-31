@@ -1,6 +1,5 @@
-# IAM Role for Lambda function
 resource "aws_iam_role" "lambda_role" {
-  name = "lambda_role"
+  name = "lambda_execution_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -10,8 +9,35 @@ resource "aws_iam_role" "lambda_role" {
         Effect = "Allow",
         Principal = {
           Service = "lambda.amazonaws.com"
-        },
+        }
       },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "lambda_role_policy" {
+  name   = "lambda_policy"
+  role   = aws_iam_role.lambda_role.id
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ],
+        Resource = "${aws_secretsmanager_secret.github_token.arn}"
+      }
     ]
   })
 }
@@ -65,7 +91,10 @@ resource "aws_iam_role" "codebuild_role" {
             "logs:PutLogEvents",
             "s3:PutObject",
             "s3:GetObject",
-            "s3:GetObjectVersion"
+            "s3:GetObjectVersion",
+            "iam:GetRole",
+            "apigateway:GET",
+            "secretsmanager:DescribeSecret"
           ],
           Effect = "Allow",
           Resource = "*"
@@ -79,6 +108,17 @@ resource "aws_iam_role" "codebuild_role" {
         ],
         Resource = "arn:aws:s3:::tfstate-rrich/*"
       },
+    {
+    "Effect": "Allow",
+    "Action": [
+      "s3:GetObject",
+      "s3:ListBucket"
+    ],
+    "Resource": [
+      "arn:aws:s3:::codepipeline-rrich/*",
+      "arn:aws:s3:::codepipeline-rrich"
+    ]
+  },
       {
         Effect = "Allow",
         Action = [
