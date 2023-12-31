@@ -85,7 +85,14 @@ resource "aws_iam_role" "codebuild_role" {
           "s3:ListBucket"
         ],
         Resource = "arn:aws:s3:::tfstate-rrich"
-      } 
+      },
+      {
+        Effect = "Allow",
+        Action = [
+         "secretsmanager:GetSecretValue"
+        ],
+        Resource = "${aws_secretsmanager_secret.github_token.arn}"
+        } 
       ]
     })
   }
