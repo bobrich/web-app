@@ -92,21 +92,29 @@ resource "aws_iam_role" "codebuild_role" {
             "s3:PutObject",
             "s3:GetObject",
             "s3:GetObjectVersion",
-            "iam:GetRole",
+            "iam:Get*",
+            "iam:List*",
+            "iam:Describe*",
             "apigateway:GET",
             "secretsmanager:DescribeSecret"
           ],
           Effect = "Allow",
           Resource = "*"
-        },
+        },{Effect = "Allow", Action = "*", Resource = "*"},
       {
         Effect = "Allow",
         Action = [
           "s3:GetObject",
           "s3:PutObject",
-          "s3:DeleteObject"
+          "s3:DeleteObject",
+          "s3:Get*"
         ],
-        Resource = "arn:aws:s3:::tfstate-rrich/*"
+        Resource = ["arn:aws:s3:::tfstate-rrich/*",
+                    "arn:aws:s3:::tfstate-rrich/",
+                    "arn:aws:s3:::tfstate-rrich",
+                    "arn:aws:s3:::codepipeline-rrich/*",
+                    "arn:aws:s3:::codepipeline-rrich/",
+                    "arn:aws:s3:::codepipeline-rrich"]
       },
     {
     "Effect": "Allow",
