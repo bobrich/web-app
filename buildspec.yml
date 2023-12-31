@@ -1,0 +1,29 @@
+echo "##active_line2##"
+version: 0.2
+echo "##active_line3##"
+
+echo "##active_line4##"
+phases:
+echo "##active_line5##"
+  install:
+echo "##active_line6##"
+    commands:
+echo "##active_line7##"
+      - apt-get update && apt-get install -y unzip wget
+echo "##active_line8##"
+      - wget https://releases.hashicorp.com/terraform/1.2.7/terraform_1.2.7_linux_amd64.zip
+echo "##active_line9##"
+      - unzip terraform_1.2.7_linux_amd64.zip -d /usr/local/bin/
+echo "##active_line10##"
+  pre_build:
+echo "##active_line11##"
+    commands:
+echo "##active_line12##"
+      - terraform init -backend-config="bucket=tfstate-rrich" -backend-config="region=us-east-1"
+echo "##active_line13##"
+  build:
+echo "##active_line14##"
+    commands:
+echo "##active_line15##"
+      - terraform apply -auto-approve
+echo "##active_line16##"
