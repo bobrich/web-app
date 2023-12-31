@@ -174,7 +174,7 @@ resource "aws_codepipeline" "web_app_pipeline" {
       version          = "1"
 
       configuration = {
-        ProjectName = "web-app"
+        ProjectName = "web-app-build"
       }
     }
   }
@@ -220,4 +220,36 @@ resource "aws_api_gateway_deployment" "my_api_deployment" {
 output "api_gateway_invoke_url" {
   value       = aws_api_gateway_deployment.my_api_deployment.invoke_url
   description = "Invoke URL for API Gateway"
+}
+
+resource "aws_codebuild_project" "web_app_build" {
+  name         = "web-app-build"
+  description  = "Build project for the web application"
+  service_role = aws_iam_role.codebuild_role.arn
+  artifacts {
+    type = "CODEPIPELINE" 
+  }
+
+  environment {
+    compute_type = "BUILD_GENERAL1_SMALL"
+    image        = "aws/codebuild/standard:5.0" 
+    type         = "LINUX_CONTAINER"
+    environment_variable {
+      name  = "EXAMPLE_VAR"
+      value = "example_value"
+    }
+  }
+
+  source {
+    type            = "CODEPIPELINE"
+    buildspec       = "buildspec.yml" 
+  }
+}
+
+terraform {
+  backend "s3" {
+    bucket = "tfstate-rrich"
+    key    = "web-app/state"
+    region = "us-east-1"
+  }
 }
